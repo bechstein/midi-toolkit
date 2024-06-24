@@ -11,7 +11,7 @@ npm install @bechstein/midi-parser
 ## Usage
 
 ```javascript
-import { MidiParser } from '@bechstein/midi-parser';
+import { MidiParser, MidiMessageType } from '@bechstein/midi-parser';
 
 const parser = new MidiParser({
   logMessages: true,
@@ -19,7 +19,17 @@ const parser = new MidiParser({
 });
 
 // register a subscriber
-parser.subscribe((message) => console.log('Received MIDI message:', message));
+parser.subscribe((message) => {
+    switch (message.type) {
+       case MidiMessageType.NOTE_OFF:
+       case MidiMessageType.NOTE_ON:
+          console.log('Received MIDI note-on and note-off message:', message);
+          break;
+       case MidiMessageType.CONTROL_CHANGE:
+          console.log('Received MIDI control change message:', message);
+          break;
+    }
+});
 
 //  request midi access
 navigator.requestMIDIAccess().then((access) => {
