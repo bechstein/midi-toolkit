@@ -6,15 +6,17 @@
   "exports": {
     ".": {
       "import": "./dist/esm/index.js",
-      "require": "./dist/cjs/index.js"
+      "require": "./dist/cjs/index.js",
+      "types": "./dist/esm/types/index.d.ts"
     }
   },
   "main": "dist/cjs/index.js",
   "module": "dist/esm/index.js",
-  "types": "dist/index.d.ts",
+  "types": "dist/cjs/types/index.d.ts",
   "scripts": {
     "build": "rollup -c",
-    "clean": "rimraf ./dist"
+    "clean": "rimraf ./dist",
+    "prepublishOnly": "npm run build"
   },
   "files": [
     "dist"
@@ -29,6 +31,7 @@
   ],
   "author": "C. Bechstein Digital GmbH",
   "license": "MIT",
+  "private": true,
   "bugs": {
     "url": "https://github.com/bechstein/midi-parser/issues"
   },
