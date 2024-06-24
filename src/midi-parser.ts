@@ -12,23 +12,25 @@ export class MidiParser {
   private _velocityPrefixes: number[] = new Array(16).fill(0);
   private _handlers: MidiMessageHandler[] = [];
 
-  constructor(public options: MidiParserOptions = {
-    logMessages: false,
-    enableHighResVelocity: false,
-  }) {}
+  constructor(
+    public options: MidiParserOptions = {
+      logMessages: false,
+      enableHighResVelocity: false,
+    }
+  ) {}
 
   public subscribe(handler: MidiMessageHandler): void {
     this._handlers.push(handler);
   }
 
   public unsubscribe(handler: MidiMessageHandler): void {
-    this._handlers = this._handlers.filter(h => h !== handler);
+    this._handlers = this._handlers.filter((h) => h !== handler);
   }
 
   public parseMessage(midiMessageEvent: MIDIMessageEvent): void {
     if (this.options.logMessages) console.log(midiMessageEvent);
     const message = this._dispatchMidiMessage(midiMessageEvent);
-    if (message) this._handlers.forEach(handler => handler(message));
+    if (message) this._handlers.forEach((handler) => handler(message));
   }
 
   private _dispatchMidiMessage(midiMessageEvent: MIDIMessageEvent): MidiMessage | undefined {
@@ -40,8 +42,8 @@ export class MidiParser {
     }
 
     const statusByte = data[0];
-    const messageType = (statusByte >> 4) & 0x0F;
-    const channel = statusByte & 0x0F;
+    const messageType = (statusByte >> 4) & 0x0f;
+    const channel = statusByte & 0x0f;
     const controllerNumber = data[1];
     const controllerValue = data[2];
 
@@ -49,7 +51,7 @@ export class MidiParser {
       case 0x8:
       case 0x9:
         return this._handleNoteOnMessage(channel, messageType, controllerNumber, controllerValue);
-      case 0xB:
+      case 0xb:
         return this._handleControlChangeMessage(controllerNumber, channel, controllerValue);
       default:
         if (this.options.logMessages) console.warn('Unhandled MIDI message type', messageType);
@@ -58,10 +60,10 @@ export class MidiParser {
   }
 
   private _handleNoteOnMessage(
-      channel: number,
-      messageType: number,
-      controllerNumber: number,
-      controllerValue: number,
+    channel: number,
+    messageType: number,
+    controllerNumber: number,
+    controllerValue: number
   ): MidiNoteOnMessage {
     const lsbVelocity = this._velocityPrefixes[channel];
     if (controllerValue === 0 || messageType === 0x8) {
@@ -79,35 +81,35 @@ export class MidiParser {
   }
 
   private _handleControlChangeMessage(
-      controllerNumber: number,
-      channel: number,
-      controllerValue: number
+    controllerNumber: number,
+    channel: number,
+    controllerValue: number
   ): MidiControlChangeMessage | undefined {
     switch (controllerNumber) {
-      case 0x40:  // sustain Pedal
+      case 0x40: // sustain Pedal
         return {
           type: MidiMessageType.CONTROL_CHANGE,
           channel: channel + 1,
           controller: ControlChangeMessageType.SUSTAIN_PEDAL,
-          value: controllerValue
+          value: controllerValue,
         };
       case 0x42: // sostenuto Pedal
         return {
           type: MidiMessageType.CONTROL_CHANGE,
           channel: channel,
           controller: ControlChangeMessageType.SOSTENUTO_PEDAL,
-          value: controllerValue
+          value: controllerValue,
         };
       case 0x43: // soft Pedal
         return {
           type: MidiMessageType.CONTROL_CHANGE,
           channel: channel,
           controller: ControlChangeMessageType.SOFT_PEDAL,
-          value: controllerValue
+          value: controllerValue,
         };
-      case 0x58:  // high resolution velocity
+      case 0x58: // high resolution velocity
         this._velocityPrefixes[channel] = controllerValue;
-        return undefined
+        return undefined;
       default:
         return undefined;
     }

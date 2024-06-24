@@ -1,5 +1,5 @@
 import { Component } from '@angular/core';
-import { MidiParser } from '@bechstein/midi-parser'
+import { MidiParser } from '@bechstein/midi-parser';
 
 @Component({
   selector: 'app-root',
@@ -14,11 +14,10 @@ export class AppComponent {
 
   constructor() {
     this.midiParser.subscribe((message) => console.log(message));
-    navigator.requestMIDIAccess()
-      .then((access) => {
-        access.inputs.forEach((input) => {
-          input.onmidimessage = (message) => this.midiParser.parseMessage(message)
-        })
+    navigator.requestMIDIAccess().then((access) => {
+      access.inputs.forEach((input) => {
+        input.onmidimessage = (message) => this.midiParser.parseMessage(message);
       });
+    });
   }
 }

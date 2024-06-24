@@ -1,4 +1,4 @@
 export interface MidiParserOptions {
-    logMessages: boolean;
-    enableHighResVelocity: boolean;
+  logMessages: boolean;
+  enableHighResVelocity: boolean;
 }
