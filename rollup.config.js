@@ -9,7 +9,12 @@ export default [
       format: 'es',
       sourcemap: true,
     },
-    plugins: [typescript(), terser()],
+    plugins: [
+      typescript({
+        tsconfig: './tsconfig.build.json',
+      }),
+      terser(),
+    ],
   },
   {
     input: 'src/index.ts',
@@ -18,6 +23,11 @@ export default [
       format: 'cjs',
       sourcemap: true,
     },
-    plugins: [typescript(), terser()],
+    plugins: [
+      typescript({
+        tsconfig: './tsconfig.build.json',
+      }),
+      terser(),
+    ],
   },
 ];
