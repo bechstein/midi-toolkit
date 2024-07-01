@@ -159,4 +159,22 @@ describe('MidiParser', () => {
     const parsed = midiParser.instant(msg);
     expect(parsed).toBeUndefined();
   });
+
+  test('should handle note on message with high-resolution velocity', () => {
+    midiParser['_velocityPrefixes'][0] = 1;
+    const msg = {
+      data: Uint8Array.from([0x90, 64, 127]),
+    } as MIDIMessageEvent;
+    midiParser.configure({ enableHighResVelocity: true });
+
+    const result = midiParser.instant(msg) as MidiNoteOnMessage;
+    expect(result).toEqual({
+      type: MidiMessageType.NOTE_ON,
+      channel: 1,
+      key: 64,
+      velocity: 16257,
+    });
+
+    expect(midiParser['_velocityPrefixes'][0]).toBe(0);
+  });
 });
