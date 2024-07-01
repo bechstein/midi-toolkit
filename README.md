@@ -52,6 +52,9 @@ navigator.requestMIDIAccess().then((access) => {
 
 // remove a subscriber
 parser.unsubscribe(handler);
+
+// change parser configuration
+parser.configure({ enableHighResVelocity: false });
 ```
 
 ## Development
