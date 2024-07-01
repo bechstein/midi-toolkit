@@ -4,7 +4,7 @@ export default {
   roots: ['<rootDir>/src/'],
   preset: 'ts-jest',
   testEnvironment: 'node',
-  coverageDirectory: './test-results',
+  coverageDirectory: './coverage',
   transform: {
     '^.+\\.[tj]sx?$': [
       'ts-jest',
