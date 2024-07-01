@@ -13,7 +13,7 @@ export class MidiParser {
   private _handlers: MidiMessageHandler[] = [];
 
   constructor(
-    public options: MidiParserOptions = {
+    private _options: MidiParserOptions = {
       logMessages: false,
       enableHighResVelocity: false,
     }
@@ -36,6 +36,17 @@ export class MidiParser {
   public instant(midiMessageEvent: MIDIMessageEvent): MidiMessage | undefined {
     if (this.options.logMessages) console.log(midiMessageEvent);
     return this._dispatchMidiMessage(midiMessageEvent);
+  }
+
+  public configure(options: Partial<MidiParserOptions>): void {
+    this._options = {
+      ...this.options,
+      ...options,
+    };
+  }
+
+  private get options(): MidiParserOptions {
+    return this._options;
   }
 
   private _dispatchMidiMessage(midiMessageEvent: MIDIMessageEvent): MidiMessage | undefined {
