@@ -33,11 +33,18 @@ export class MidiParser {
     if (message) this._handlers.forEach((handler) => handler(message));
   }
 
-  private _dispatchMidiMessage(midiMessageEvent: MIDIMessageEvent): MidiMessage | undefined {
-    const data = midiMessageEvent.data;
+  public instant(midiMessageEvent: MIDIMessageEvent): MidiMessage | undefined {
+    if (this.options.logMessages) console.log(midiMessageEvent);
+    return this._dispatchMidiMessage(midiMessageEvent);
+  }
 
-    if (!data && this.options.logMessages) {
-      console.warn('Undefined MIDI event packet');
+  private _dispatchMidiMessage(midiMessageEvent: MIDIMessageEvent): MidiMessage | undefined {
+    let data: Uint8Array;
+
+    if (midiMessageEvent.data) {
+      data = midiMessageEvent.data;
+    } else {
+      if (this.options.logMessages) console.warn('Undefined MIDI event packet');
       return undefined;
     }
 
