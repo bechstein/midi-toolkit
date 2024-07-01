@@ -8,5 +8,13 @@
     "@typescript-eslint/no-inferrable-types": 1,
     "@typescript-eslint/no-this-alias": 1
   },
-  "ignorePatterns": ["**/dist", "**/node_modules", "**/.angular"]
+  "ignorePatterns": ["**/dist", "**/node_modules", "**/.angular"],
+  "overrides": [
+    {
+      "files": ["src/**/*.test.ts"],
+      "env": {
+        "jest": true
+      }
+    }
+  ]
 }
