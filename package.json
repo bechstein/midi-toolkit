@@ -1,6 +1,6 @@
 {
   "name": "@bechstein/midi-parser",
-  "version": "1.0.2",
+  "version": "1.0.3",
   "description": "A MIDI message parser for simplified event handling",
   "type": "module",
   "exports": {
