@@ -1,18 +1,18 @@
 {
   "name": "@bechstein/midi-parser",
-  "version": "1.0.2",
+  "version": "1.0.3",
   "description": "A MIDI message parser for simplified event handling",
   "type": "module",
   "exports": {
     ".": {
       "import": "./dist/esm/index.js",
       "require": "./dist/cjs/index.js",
-      "types": "./dist/esm/types/index.d.ts"
+      "types": "./dist/esm/index.d.ts"
     }
   },
   "main": "dist/cjs/index.js",
   "module": "dist/esm/index.js",
-  "types": "dist/cjs/types/index.d.ts",
+  "types": "dist/cjs/index.d.ts",
   "scripts": {
     "lint": "npm run eslint && npm run prettier -- --check",
     "fmt": "npm run eslint -- --fix && npm run prettier -- --write",
