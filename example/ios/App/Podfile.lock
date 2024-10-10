@@ -1,0 +1,28 @@
+PODS:
+  - BechsteinCapacitorMidi (1.1.2):
+    - Capacitor
+  - Capacitor (5.7.8):
+    - CapacitorCordova
+  - CapacitorCordova (5.7.8)
+
+DEPENDENCIES:
+  - "BechsteinCapacitorMidi (from `../../node_modules/@bechstein/capacitor-midi`)"
+  - "Capacitor (from `../../node_modules/@capacitor/ios`)"
+  - "CapacitorCordova (from `../../node_modules/@capacitor/ios`)"
+
+EXTERNAL SOURCES:
+  BechsteinCapacitorMidi:
+    :path: "../../node_modules/@bechstein/capacitor-midi"
+  Capacitor:
+    :path: "../../node_modules/@capacitor/ios"
+  CapacitorCordova:
+    :path: "../../node_modules/@capacitor/ios"
+
+SPEC CHECKSUMS:
+  BechsteinCapacitorMidi: f0c2ed00bf4da29290362dcd60d2cbbc1b2c219a
+  Capacitor: 747aadb4fa786f460d8cd9d0557cb81440a13747
+  CapacitorCordova: 31ab98dca2ddcee051027a1afe7e8c85c82f7297
+
+PODFILE CHECKSUM: d4d1778c314d438275f17d35b24d649744f7b3de
+
+COCOAPODS: 1.15.2
