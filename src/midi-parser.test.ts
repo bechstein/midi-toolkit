@@ -2,6 +2,7 @@ import { MidiMessage, MidiParser } from './midi-parser';
 import { MidiParserOptions } from './types/midi-parser-options';
 import { MidiNoteOnMessage } from './types/midi-note-on-message';
 import { MidiMessageType } from './types/midi-message-type';
+import { ControlChangeMessageType } from './types/control-change-message-type';
 
 describe('MidiParser', () => {
   let midiParser: MidiParser;
@@ -81,14 +82,14 @@ describe('MidiParser', () => {
     const msg = {
       data: Uint8Array.from([n, 21, 1]),
     } as MIDIMessageEvent;
-    expect(midiParser.instant(msg)?.channel).toBe(expected);
+    expect(midiParser.instant(msg)[0]?.channel).toBe(expected);
   });
 
   test('should parse midi note on message and instant return the message', () => {
     const msg = {
       data: Uint8Array.from([0x90, 60, 100]),
     } as MIDIMessageEvent;
-    const parsed = midiParser.instant(msg) as MidiNoteOnMessage;
+    const parsed = midiParser.instant(msg)[0] as MidiNoteOnMessage;
     expect(parsed).toStrictEqual({
       type: MidiMessageType.NOTE_ON,
       channel: 1,
@@ -99,14 +100,14 @@ describe('MidiParser', () => {
 
   test('should return undefined if midi message does not have data', () => {
     const msg = {} as MIDIMessageEvent;
-    expect(midiParser.instant(msg)).toBeUndefined();
+    expect(midiParser.instant(msg)).toStrictEqual([]);
   });
 
   test('should normalize note off message and parse the data', () => {
     const msg = {
       data: Uint8Array.from([0x90, 60, 0]),
     } as MIDIMessageEvent;
-    const parsed = midiParser.instant(msg) as MidiNoteOnMessage;
+    const parsed = midiParser.instant(msg)[0] as MidiNoteOnMessage;
     expect(parsed).toStrictEqual({
       type: MidiMessageType.NOTE_ON,
       channel: 1,
@@ -119,7 +120,7 @@ describe('MidiParser', () => {
     const msg = {
       data: Uint8Array.from([0x81, 60, 0]),
     } as MIDIMessageEvent;
-    const parsed = midiParser.instant(msg) as MidiNoteOnMessage;
+    const parsed = midiParser.instant(msg)[0] as MidiNoteOnMessage;
     expect(parsed).toStrictEqual({
       type: MidiMessageType.NOTE_ON,
       channel: 2,
@@ -133,7 +134,7 @@ describe('MidiParser', () => {
     const handler2 = jest.fn();
     midiParser.subscribe(handler1);
     midiParser.subscribe(handler2);
-    midiParser['_dispatchMidiMessage'] = jest.fn().mockReturnValue({} as MidiNoteOnMessage);
+    midiParser['_dispatchMidiMessage'] = jest.fn().mockReturnValue([{} as MidiNoteOnMessage]);
 
     midiParser.parseMessage({} as MIDIMessageEvent);
     expect(handler1).toHaveBeenCalledTimes(1);
@@ -146,7 +147,7 @@ describe('MidiParser', () => {
     const handler1 = jest.fn();
     const msg = {} as MIDIMessageEvent;
     midiParser.subscribe(handler1);
-    midiParser['_dispatchMidiMessage'] = jest.fn().mockReturnValue({} as MidiNoteOnMessage);
+    midiParser['_dispatchMidiMessage'] = jest.fn().mockReturnValue([{} as MidiNoteOnMessage]);
 
     midiParser.parseMessage(msg);
     expect(console.log).toHaveBeenNthCalledWith(1, msg);
@@ -157,7 +158,7 @@ describe('MidiParser', () => {
       data: Uint8Array.from([0x1, 60, 0]),
     } as MIDIMessageEvent;
     const parsed = midiParser.instant(msg);
-    expect(parsed).toBeUndefined();
+    expect(parsed).toStrictEqual([undefined]);
   });
 
   test('should handle note on message with high-resolution velocity', () => {
@@ -167,7 +168,7 @@ describe('MidiParser', () => {
     } as MIDIMessageEvent;
     midiParser.configure({ enableHighResVelocity: true });
 
-    const result = midiParser.instant(msg) as MidiNoteOnMessage;
+    const result = midiParser.instant(msg)[0] as MidiNoteOnMessage;
     expect(result).toEqual({
       type: MidiMessageType.NOTE_ON,
       channel: 1,
@@ -176,5 +177,154 @@ describe('MidiParser', () => {
     });
 
     expect(midiParser['_velocityPrefixes'][0]).toBe(0);
+  });
+
+  test.each([
+    [
+      [144, 60, 100, 144, 64, 120],
+      [
+        {
+          type: MidiMessageType.NOTE_ON,
+          channel: 1,
+          key: 60,
+          velocity: 100,
+        },
+        {
+          type: MidiMessageType.NOTE_ON,
+          channel: 1,
+          key: 64,
+          velocity: 120,
+        },
+      ],
+    ],
+    [
+      [144, 60, 100, 145, 64, 120],
+      [
+        {
+          type: MidiMessageType.NOTE_ON,
+          channel: 1,
+          key: 60,
+          velocity: 100,
+        },
+        {
+          type: MidiMessageType.NOTE_ON,
+          channel: 2,
+          key: 64,
+          velocity: 120,
+        },
+      ],
+    ],
+    [
+      [176, 64, 127, 144, 72, 90],
+      [
+        {
+          type: MidiMessageType.CONTROL_CHANGE,
+          channel: 1,
+          controller: ControlChangeMessageType.SUSTAIN_PEDAL,
+          value: 127,
+        },
+        {
+          type: MidiMessageType.NOTE_ON,
+          channel: 1,
+          key: 72,
+          velocity: 90,
+        },
+      ],
+    ],
+    [
+      [178, 64, 127, 147, 72, 90],
+      [
+        {
+          type: MidiMessageType.CONTROL_CHANGE,
+          channel: 3,
+          controller: ControlChangeMessageType.SUSTAIN_PEDAL,
+          value: 127,
+        },
+        {
+          type: MidiMessageType.NOTE_ON,
+          channel: 4,
+          key: 72,
+          velocity: 90,
+        },
+      ],
+    ],
+    [
+      [176, 66, 127, 144, 72, 90],
+      [
+        {
+          type: MidiMessageType.CONTROL_CHANGE,
+          channel: 1,
+          controller: ControlChangeMessageType.SOSTENUTO_PEDAL,
+          value: 127,
+        },
+        {
+          type: MidiMessageType.NOTE_ON,
+          channel: 1,
+          key: 72,
+          velocity: 90,
+        },
+      ],
+    ],
+    [
+      [176, 67, 127, 144, 72, 90],
+      [
+        {
+          type: MidiMessageType.CONTROL_CHANGE,
+          channel: 1,
+          controller: ControlChangeMessageType.SOFT_PEDAL,
+          value: 127,
+        },
+        {
+          type: MidiMessageType.NOTE_ON,
+          channel: 1,
+          key: 72,
+          velocity: 90,
+        },
+      ],
+    ],
+    [
+      [176, 7, 100, 176, 10, 64],
+      [undefined, undefined],
+    ],
+    [
+      [144, 50, 80, 176, 64, 127],
+      [
+        {
+          type: MidiMessageType.NOTE_ON,
+          channel: 1,
+          key: 50,
+          velocity: 80,
+        },
+        {
+          type: MidiMessageType.CONTROL_CHANGE,
+          channel: 1,
+          controller: ControlChangeMessageType.SUSTAIN_PEDAL,
+          value: 127,
+        },
+      ],
+    ],
+    [
+      [153, 50, 80, 191, 64, 127],
+      [
+        {
+          type: MidiMessageType.NOTE_ON,
+          channel: 10,
+          key: 50,
+          velocity: 80,
+        },
+        {
+          type: MidiMessageType.CONTROL_CHANGE,
+          channel: 16,
+          controller: ControlChangeMessageType.SUSTAIN_PEDAL,
+          value: 127,
+        },
+      ],
+    ],
+  ])('should parse messages with multiple events', (data, expected) => {
+    const msg = {
+      data: Uint8Array.from(data),
+    } as MIDIMessageEvent;
+    const parsed = midiParser.instant(msg);
+    expect(parsed).toStrictEqual(expected);
   });
 });

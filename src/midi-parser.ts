@@ -9,6 +9,7 @@ export type MidiMessage = MidiNoteOnMessage | MidiNoteOffMessage | MidiControlCh
 export type MidiMessageHandler = (message: MidiMessage) => void;
 
 export class MidiParser {
+  private static readonly MESSAGE_TYPES = [0x8, 0x9, 0xa, 0xb, 0xe, 0xc, 0xd];
   private _velocityPrefixes: number[] = new Array(16).fill(0);
   private _handlers: MidiMessageHandler[] = [];
 
@@ -29,11 +30,15 @@ export class MidiParser {
 
   public parseMessage(midiMessageEvent: MIDIMessageEvent): void {
     if (this.options.logMessages) console.log(midiMessageEvent);
-    const message = this._dispatchMidiMessage(midiMessageEvent);
-    if (message) this._handlers.forEach((handler) => handler(message));
+    const messageArr = this._dispatchMidiMessage(midiMessageEvent);
+    messageArr.forEach((message) => {
+      this._handlers.forEach((handler) => {
+        if (message) handler(message);
+      });
+    });
   }
 
-  public instant(midiMessageEvent: MIDIMessageEvent): MidiMessage | undefined {
+  public instant(midiMessageEvent: MIDIMessageEvent): (MidiMessage | undefined)[] {
     if (this.options.logMessages) console.log(midiMessageEvent);
     return this._dispatchMidiMessage(midiMessageEvent);
   }
@@ -49,32 +54,40 @@ export class MidiParser {
     return this._options;
   }
 
-  private _dispatchMidiMessage(midiMessageEvent: MIDIMessageEvent): MidiMessage | undefined {
+  private _dispatchMidiMessage(midiMessageEvent: MIDIMessageEvent): (MidiMessage | undefined)[] {
     let data: Uint8Array;
 
     if (midiMessageEvent.data) {
       data = midiMessageEvent.data;
     } else {
       if (this.options.logMessages) console.warn('Undefined MIDI event packet');
-      return undefined;
+      return [];
     }
 
-    const statusByte = data[0];
-    const messageType = (statusByte >> 4) & 0x0f;
-    const channel = statusByte & 0x0f;
-    const controllerNumber = data[1];
-    const controllerValue = data[2];
+    const splitChunks = this._splitPayload(data);
 
-    switch (messageType) {
-      case 0x8:
-      case 0x9:
-        return this._handleNoteOnMessage(channel, messageType, controllerNumber, controllerValue);
-      case 0xb:
-        return this._handleControlChangeMessage(controllerNumber, channel, controllerValue);
-      default:
-        if (this.options.logMessages) console.warn('Unhandled MIDI message type', messageType);
-        return undefined;
-    }
+    return splitChunks.map((chunk) => {
+      const statusByte = chunk[0];
+      const messageType = MidiParser.getMessageType(statusByte);
+      const channel = statusByte & 0x0f;
+      const controllerNumber = chunk[1];
+      const controllerValue = chunk[2];
+
+      switch (messageType) {
+        case 0x8:
+        case 0x9:
+          return this._handleNoteOnMessage(channel, messageType, controllerNumber, controllerValue);
+        case 0xb:
+          return this._handleControlChangeMessage(controllerNumber, channel, controllerValue);
+        case 0xa:
+        case 0xe:
+        case 0xc:
+        case 0xd:
+        default:
+          if (this.options.logMessages) console.warn('Unhandled MIDI message type', messageType);
+          return undefined;
+      }
+    });
   }
 
   private _handleNoteOnMessage(
@@ -114,14 +127,14 @@ export class MidiParser {
       case 0x42: // sostenuto Pedal
         return {
           type: MidiMessageType.CONTROL_CHANGE,
-          channel: channel,
+          channel: channel + 1,
           controller: ControlChangeMessageType.SOSTENUTO_PEDAL,
           value: controllerValue,
         };
       case 0x43: // soft Pedal
         return {
           type: MidiMessageType.CONTROL_CHANGE,
-          channel: channel,
+          channel: channel + 1,
           controller: ControlChangeMessageType.SOFT_PEDAL,
           value: controllerValue,
         };
@@ -131,5 +144,35 @@ export class MidiParser {
       default:
         return undefined;
     }
+  }
+
+  private _splitPayload(data: Uint8Array): Uint8Array[] {
+    const splitPayload: Uint8Array[] = [];
+    let currentMessage: number[] = [];
+
+    for (let i = 0; i < data.length; i++) {
+      const byte = data[i];
+      if (MidiParser.isMessageTypeByte(byte) && currentMessage.length > 0) {
+        splitPayload.push(Uint8Array.from(currentMessage));
+        currentMessage = [];
+      }
+
+      currentMessage.push(byte);
+
+      if (i === data.length - 1) {
+        splitPayload.push(Uint8Array.from(currentMessage));
+        currentMessage = [];
+      }
+    }
+
+    return splitPayload;
+  }
+
+  private static getMessageType(statusByte: number): number {
+    return (statusByte >> 4) & 0x0f;
+  }
+
+  private static isMessageTypeByte(byte: number): boolean {
+    return MidiParser.MESSAGE_TYPES.some((statusByte) => statusByte === MidiParser.getMessageType(byte));
   }
 }
