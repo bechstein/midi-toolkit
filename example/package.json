@@ -6,7 +6,12 @@
     "start": "ng serve",
     "build": "ng build",
     "watch": "ng build --watch --configuration development",
-    "test": "ng test"
+    "test": "ng test",
+    "eslint": "eslint . --ext ts",
+    "prettier:check": "npx prettier . --check",
+    "lint": "npm run eslint && npm run prettier:check",
+    "prettier:fix": "npx prettier . --write",
+    "fmt": "npm run eslint -- --fix && npm run prettier:fix"
   },
   "private": true,
   "dependencies": {
@@ -19,7 +24,7 @@
     "@angular/platform-browser-dynamic": "^18.0.0",
     "@angular/router": "^18.0.0",
     "@bechstein/capacitor-midi": "^1.1.2",
-    "@bechstein/midi-parser": "file:../midi-toolkit",
+    "@bechstein/midi-toolkit": "file:../midi-toolkit",
     "@capacitor/android": "^5.7.8",
     "@capacitor/core": "^5.7.8",
     "@capacitor/ios": "^5.7.8",
@@ -30,17 +35,30 @@
   },
   "devDependencies": {
     "@angular-devkit/build-angular": "^18.0.5",
+    "@angular-eslint/builder": "^18.3.0",
+    "@angular-eslint/eslint-plugin": "^18.3.0",
+    "@angular-eslint/eslint-plugin-template": "^18.3.0",
+    "@angular-eslint/schematics": "^18.3.0",
+    "@angular-eslint/template-parser": "^18.3.0",
     "@angular/cli": "^18.0.5",
     "@angular/compiler-cli": "^18.0.0",
+    "@bechstein/prettier-config": "^1.0.0",
     "@capacitor/cli": "^5.7.8",
     "@ionic/angular-toolkit": "latest",
     "@types/jasmine": "~5.1.0",
+    "@typescript-eslint/eslint-plugin": "^8.5.0",
+    "@typescript-eslint/parser": "^8.5.0",
+    "eslint": "^8.57.0",
+    "eslint-config-prettier": "^9.1.0",
+    "eslint-plugin-prettier": "^5.2.1",
     "jasmine-core": "~5.1.0",
     "karma": "~6.4.0",
     "karma-chrome-launcher": "~3.2.0",
     "karma-coverage": "~2.2.0",
     "karma-jasmine": "~5.1.0",
     "karma-jasmine-html-reporter": "~2.1.0",
+    "prettier": "^3.3.3",
     "typescript": "~5.4.2"
-  }
+  },
+  "prettier": "@bechstein/prettier-config"
 }
