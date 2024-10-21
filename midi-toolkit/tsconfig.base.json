@@ -1,10 +1,7 @@
 {
   "compilerOptions": {
     "target": "ES2022",
-    "lib": [
-      "ES2022",
-      "DOM"
-    ],
+    "lib": ["ES2022", "DOM"],
     "module": "ESNext",
     "rootDir": "src",
     "strict": true,
@@ -13,5 +10,5 @@
     "sourceMap": true,
     "forceConsistentCasingInFileNames": true,
     "declaration": true
-  },
+  }
 }

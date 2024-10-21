@@ -3,5 +3,5 @@
   "compilerOptions": {
     "types": ["jest"]
   },
-  "files": ["src/**/*.test.ts"],
+  "files": ["src/**/*.test.ts"]
 }

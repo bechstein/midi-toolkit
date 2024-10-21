@@ -37,9 +37,9 @@ navigator.requestMIDIAccess().then((access) => {
     input.onmidimessage = (message) => {
        // parsed messages will be dispatched to the subscribers
        parser.parseMessage(message);
-       
+
        // or
-       
+
        // directly parse the message and use it
        const parsedMessage = parser.instant(message);
        console.log(parsedMessage)
