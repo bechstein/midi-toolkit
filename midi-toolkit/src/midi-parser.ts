@@ -94,7 +94,7 @@ export class MidiParser {
     controllerNumber: number,
     controllerValue: number
   ): MidiNoteOnMessage {
-    const lsbVelocity = this._velocityPrefixes[channel];
+    const lsbVelocity = this._velocityPrefixes[channel - 1];
     if (isNoteOff(data)) {
       //  an event is note-off if its of type 0x9 with velocity 0 or its of type 0x8
       return { type: 144, channel: channel, key: controllerNumber, velocity: 0 };
