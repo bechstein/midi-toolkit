@@ -1,7 +1,5 @@
-import { MidiMessageType } from './midi-message-type';
-
 export interface MidiNoteOffMessage {
-  type: MidiMessageType.NOTE_OFF;
+  type: 128;
   channel: number;
   key: number;
   velocity: number;
