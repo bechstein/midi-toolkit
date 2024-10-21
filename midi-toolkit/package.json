@@ -1,5 +1,5 @@
 {
-  "name": "@bechstein/midi-parser",
+  "name": "@bechstein/midi-toolkit",
   "version": "1.1.0",
   "description": "A utility package for handling MIDI messages",
   "type": "module",
