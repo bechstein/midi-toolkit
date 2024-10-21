@@ -18,6 +18,8 @@ import { isSostenutoPedal } from './is-sostenuto-pedal';
 import { isHighResVelocity } from './is-high-res-velocity';
 import { splitDataPayload } from './split-data-payload';
 import { getHighResVelocity } from './get-high-res-velocity';
+import { getNoteNumber } from './get-note-number';
+import { getVelocity } from './get-velocity';
 
 export { MidiNoteOnMessage } from './types/midi-note-on-message';
 export { MidiNoteOffMessage } from './types/midi-note-off-message';
@@ -46,4 +48,6 @@ export {
   isHighResVelocity,
   splitDataPayload,
   getHighResVelocity,
+  getNoteNumber,
+  getVelocity,
 };
