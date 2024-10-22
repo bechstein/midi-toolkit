@@ -6,9 +6,6 @@ on:
       - "**"
     types:
       - opened
-  push:
-    branches:
-      - "**"
 
 jobs:
   installPluginDependencies:
