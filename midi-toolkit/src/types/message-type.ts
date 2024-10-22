@@ -6,4 +6,5 @@ export enum MessageType {
   PITCH_BEND = 0xe,
   PROGRAM_CHANGE = 0xc,
   CHANNEL_AFTERTOUCH = 0xd,
+  SYSEX = 0x0f,
 }

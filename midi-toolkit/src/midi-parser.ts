@@ -11,6 +11,8 @@ import { getControllerValue } from './get-controller-value';
 import { splitDataPayload } from './split-data-payload';
 import { isNoteOff } from './is-note-off';
 import { getHighResVelocity } from './get-high-res-velocity';
+import { getNoteNumber } from './get-note-number';
+import { getVelocity } from './get-velocity';
 
 export type MidiMessage = MidiNoteOnMessage | MidiNoteOffMessage | MidiControlChangeMessage;
 export type MidiMessageHandler = (message: MidiMessage) => void;
@@ -69,15 +71,13 @@ export class MidiParser {
     return splitChunks.map((chunk) => {
       const messageType = getType(chunk);
       const channel = getChannel(chunk);
-      const controllerNumber = getControllerNumber(chunk);
-      const controllerValue = getControllerValue(chunk);
 
       switch (messageType) {
         case MessageType.NOTE_OFF:
         case MessageType.NOTE_ON:
-          return this._handleNoteOnMessage(channel, chunk, controllerNumber, controllerValue);
+          return this._handleNoteOnMessage(channel, chunk);
         case MessageType.CONTROL_CHANGE:
-          return this._handleControlChangeMessage(controllerNumber, channel, controllerValue);
+          return this._handleControlChangeMessage(channel, chunk);
         case MessageType.POLYPHONIC_AFTERTOUCH:
         case MessageType.PITCH_BEND:
         case MessageType.PROGRAM_CHANGE:
@@ -88,31 +88,28 @@ export class MidiParser {
     });
   }
 
-  private _handleNoteOnMessage(
-    channel: number,
-    data: Uint8Array,
-    controllerNumber: number,
-    controllerValue: number
-  ): MidiNoteOnMessage {
+  private _handleNoteOnMessage(channel: number, data: Uint8Array): MidiNoteOnMessage {
     const lsbVelocity = this._velocityPrefixes[channel - 1];
+    const noteNumber = getNoteNumber(data);
+    const velocity = getVelocity(data);
+
     if (isNoteOff(data)) {
       //  an event is note-off if its of type 0x9 with velocity 0 or its of type 0x8
-      return { type: 144, channel: channel, key: controllerNumber, velocity: 0 };
+      return { type: 144, channel: channel, key: noteNumber, velocity: 0 };
     } else if (this.options.enableHighResVelocity && lsbVelocity) {
       // provide highRes info if highRes is enabled and there exists LSB velocity for this channel
       const velocity = getHighResVelocity(data, lsbVelocity);
-      return { type: 144, channel: channel, key: controllerNumber, velocity };
+      return { type: 144, channel: channel, key: noteNumber, velocity };
     } else {
       // normal note-on event
-      return { type: 144, channel: channel, key: controllerNumber, velocity: controllerValue };
+      return { type: 144, channel: channel, key: noteNumber, velocity: velocity };
     }
   }
 
-  private _handleControlChangeMessage(
-    controllerNumber: number,
-    channel: number,
-    controllerValue: number
-  ): MidiControlChangeMessage | undefined {
+  private _handleControlChangeMessage(channel: number, data: Uint8Array): MidiControlChangeMessage | undefined {
+    const controllerNumber = getControllerNumber(data);
+    const controllerValue = getControllerValue(data);
+
     switch (controllerNumber) {
       case ControlChangeMessageType.SUSTAIN_PEDAL:
         return {

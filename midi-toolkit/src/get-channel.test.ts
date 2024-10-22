@@ -35,7 +35,7 @@ describe('getChannel', () => {
   });
 
   test('should return -1 when data is empty', () => {
-    (getStatusByte as jest.Mock).mockReturnValue(undefined);
+    (getStatusByte as jest.Mock).mockReturnValue(-1);
     expect(getChannel(new Uint8Array([]))).toBe(-1);
   });
 
