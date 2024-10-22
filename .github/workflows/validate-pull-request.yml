@@ -141,6 +141,8 @@ jobs:
           registry-url: "https://npm.pkg.github.com"
           cache: "npm"
           cache-dependency-path: example/package-lock.json
+        env:
+          NODE_AUTH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
       - name: Download plugin dist
         uses: actions/download-artifact@v4
         with:
