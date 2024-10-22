@@ -2,7 +2,7 @@
 
 ## Installation
 
-Install `@bechstein/midi-parser` using npm:
+Install `@bechstein/midi-toolkit` using npm:
 
 ```bash
 npm install @bechstein/midi-toolkit
@@ -61,7 +61,7 @@ The prerequisites for setting up your development environment can be found below
 1. **Clone the repository:**
    ```bash
    git clone https://github.com/bechstein/midi-toolkit.git
-   cd midi-parser
+   cd midi-toolkit
    ```
 2. **Install dependencies:**
    ```
