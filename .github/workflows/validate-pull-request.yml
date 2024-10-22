@@ -14,6 +14,9 @@ jobs:
   installPluginDependencies:
     name: Install plugin dependencies (NPM)
     runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: midi-toolkit
     steps:
       - name: Checkout repository
         uses: actions/checkout@v4
@@ -95,6 +98,9 @@ jobs:
   lintPlugin:
     name: Lint plugin
     runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: midi-toolkit
     steps:
       - name: Checkout repository
         uses: actions/checkout@v4
