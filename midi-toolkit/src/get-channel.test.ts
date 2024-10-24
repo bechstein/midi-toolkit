@@ -34,9 +34,11 @@ describe('getChannel', () => {
     expect(result).toBe(16);
   });
 
-  test('should return -1 when data is empty', () => {
-    (getStatusByte as jest.Mock).mockReturnValue(-1);
-    expect(getChannel(new Uint8Array([]))).toBe(-1);
+  test('should throw error when data is empty', () => {
+    (getStatusByte as jest.Mock).mockImplementation((data) => {
+      throw new Error(data);
+    });
+    expect(() => getChannel(new Uint8Array([]))).toThrow();
   });
 
   test('should return channel for valid running status', () => {
@@ -51,13 +53,13 @@ describe('getChannel', () => {
     expect(result).toBe(8);
   });
 
-  test('should return -1 when status byte is 0xf0', () => {
+  test('should throw error when status byte is 0xf0', () => {
     (getStatusByte as jest.Mock).mockReturnValue(0xf0);
-    expect(getChannel(new Uint8Array([]))).toBe(-1);
+    expect(() => getChannel(new Uint8Array([]))).toThrow();
   });
 
-  test('should return -1 when status byte is 0xff', () => {
+  test('should throw error when status byte is 0xff', () => {
     (getStatusByte as jest.Mock).mockReturnValue(0xff);
-    expect(getChannel(new Uint8Array([]))).toBe(-1);
+    expect(() => getChannel(new Uint8Array([]))).toThrow();
   });
 });

@@ -12,7 +12,7 @@ describe('getStatusByte', () => {
   });
 
   test('should throw an error for empty data', () => {
-    expect(getStatusByte(new Uint8Array([]))).toBe(-1);
+    expect(() => getStatusByte(new Uint8Array([]))).toThrow();
   });
 
   test('should return the first byte when data has multiple bytes', () => {

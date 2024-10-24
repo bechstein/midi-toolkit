@@ -18,25 +18,19 @@ describe('getControllerValue', () => {
     expect(result).toBe(100);
   });
 
-  test('should return -1 for a Note On message', () => {
+  test('should throw error for a Note On message', () => {
     (getType as jest.Mock).mockReturnValue(MessageType.NOTE_ON);
-
-    const result = getControllerValue(new Uint8Array([144, 60, 100]));
-    expect(result).toBe(-1);
+    expect(() => getControllerValue(new Uint8Array([144, 60, 100]))).toThrow();
   });
 
-  test('should return -1 for a Note Off message', () => {
+  test('should throw error for a Note Off message', () => {
     (getType as jest.Mock).mockReturnValue(MessageType.NOTE_OFF);
-
-    const result = getControllerValue(new Uint8Array([128, 60, 0]));
-    expect(result).toBe(-1);
+    expect(() => getControllerValue(new Uint8Array([128, 60, 0]))).toThrow();
   });
 
-  test('should return -1 for an incomplete Control Change message (missing third byte)', () => {
+  test('should throw error for an incomplete Control Change message (missing third byte)', () => {
     (getType as jest.Mock).mockReturnValue(MessageType.CONTROL_CHANGE);
-
-    const result = getControllerValue(new Uint8Array([176, 7]));
-    expect(result).toBe(-1);
+    expect(() => getControllerValue(new Uint8Array([176, 7]))).toThrow();
   });
 
   test('should return the correct controller value when the third byte is 0', () => {
@@ -46,17 +40,13 @@ describe('getControllerValue', () => {
     expect(result).toBe(0);
   });
 
-  test('should return -1 for an unknown message type', () => {
+  test('should throw error for an unknown message type', () => {
     (getType as jest.Mock).mockReturnValue(999);
-
-    const result = getControllerValue(new Uint8Array([176, 7, 100]));
-    expect(result).toBe(-1);
+    expect(() => getControllerValue(new Uint8Array([176, 7, 100]))).toThrow();
   });
 
-  test('should return -1 for invalid or empty data', () => {
+  test('should throw error for invalid or empty data', () => {
     (getType as jest.Mock).mockReturnValue(MessageType.CONTROL_CHANGE);
-
-    const result = getControllerValue(new Uint8Array([]));
-    expect(result).toBe(-1);
+    expect(() => getControllerValue(new Uint8Array([]))).toThrow();
   });
 });

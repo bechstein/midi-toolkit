@@ -32,11 +32,9 @@ describe('getHighResVelocity', () => {
     expect(result).toBe((32 << 7) | 5);
   });
 
-  test('should return -1 for a Control Change message', () => {
+  test('should throw error for a Control Change message', () => {
     (getType as jest.Mock).mockReturnValue(MessageType.CONTROL_CHANGE);
-
-    const result = getHighResVelocity(new Uint8Array([176, 7, 100]), 10);
-    expect(result).toBe(-1);
+    expect(() => getHighResVelocity(new Uint8Array([176, 7, 100]), 10)).toThrow();
   });
 
   test('should return correct velocity when lsb is 0', () => {
@@ -55,18 +53,16 @@ describe('getHighResVelocity', () => {
     expect(result).toBe((100 << 7) | 127);
   });
 
-  test('should return -1 when getVelocity returns an invalid value', () => {
+  test('should throw error when getVelocity returns an invalid value', () => {
     (getType as jest.Mock).mockReturnValue(MessageType.NOTE_ON);
-    (getVelocity as jest.Mock).mockReturnValue(-1);
-
-    const result = getHighResVelocity(new Uint8Array([144, 60, 100]), 10);
-    expect(result).toBe(-1);
+    (getVelocity as jest.Mock).mockImplementation((data) => {
+      throw new Error(data);
+    });
+    expect(() => getHighResVelocity(new Uint8Array([144, 60, 100]), 10)).toThrow();
   });
 
-  test('should return -1 for an unknown message type', () => {
+  test('should throw error for an unknown message type', () => {
     (getType as jest.Mock).mockReturnValue(999);
-
-    const result = getHighResVelocity(new Uint8Array([144, 60, 100]), 10);
-    expect(result).toBe(-1);
+    expect(() => getHighResVelocity(new Uint8Array([144, 60, 100]), 10)).toThrow();
   });
 });
