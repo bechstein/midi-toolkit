@@ -1,9 +1,21 @@
 import { getStatusByte } from './get-status-byte';
+import { getType } from './get-type';
+import { MessageType } from './types/message-type';
+import { InvalidMIDIMessageError } from './error/invalid-midi-message-error';
 
+/**
+ * @throws {Error}
+ */
 export function getChannel(data: Uint8Array): number {
-  const statusByte = getStatusByte(data);
-  if ((statusByte >= 0xf0 && statusByte <= 0xff) || statusByte < 0) {
-    // 240 to 255
-    return -1;
-  } else return (statusByte & 0x0f) + 1;
+  const type = getType(data);
+  if (type === MessageType.SYSEX) {
+    throw new InvalidMIDIMessageError(
+      'UnsupportedMIDIMessageError',
+      'Cannot get channel for System Exclusive messages.',
+      type
+    );
+  } else {
+    const statusByte = getStatusByte(data);
+    return (statusByte & 0x0f) + 1;
+  }
 }
