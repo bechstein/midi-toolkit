@@ -3,3 +3,4 @@
 **/dist
 **/coverage
 .npmrc
+typedoc-output
