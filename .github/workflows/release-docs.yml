@@ -36,7 +36,7 @@ jobs:
         uses: actions/upload-pages-artifact@v3
         with:
           name: midi-toolkit-docs
-          path: typedoc-output/
+          path: midi-toolkit/typedoc-output
           retention-days: 1
           if-no-files-found: error
 
