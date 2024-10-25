@@ -1,4 +1,4 @@
-# @bechstein/midi-parser
+# @bechstein/midi-toolkit
 
 ## Installation
 
