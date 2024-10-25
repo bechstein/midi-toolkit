@@ -1,9 +1,8 @@
 name: Release docs
 
 on:
-  push:
-    branches:
-      - "**"
+  registry_package:
+    types: [published]
 
 jobs:
   generateDocs:
@@ -38,7 +37,6 @@ jobs:
           name: midi-toolkit-docs
           path: midi-toolkit/typedoc-output
           retention-days: 1
-          if-no-files-found: error
 
   releaseDocs:
     name: Release docs to GitHub pages
