@@ -1,0 +1,211 @@
+name: Validate pull request
+
+on:
+  pull_request:
+    branches:
+      - "**"
+
+jobs:
+  installPluginDependencies:
+    name: Install plugin dependencies (NPM)
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: midi-toolkit
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 1
+          sparse-checkout-cone-mode: 'true'
+          sparse-checkout: midi-toolkit
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version-file: midi-toolkit/.nvmrc
+          registry-url: "https://npm.pkg.github.com"
+          cache: "npm"
+          cache-dependency-path: midi-toolkit/package-lock.json
+        env:
+          NODE_AUTH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      - name: Install dependencies
+        run: npm ci
+
+  buildPlugin:
+    name: Build plugin
+    runs-on: ubuntu-latest
+    needs: installPluginDependencies
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 1
+          sparse-checkout-cone-mode: 'true'
+          sparse-checkout: midi-toolkit
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version-file: midi-toolkit/.nvmrc
+          registry-url: "https://npm.pkg.github.com"
+          cache: "npm"
+          cache-dependency-path: midi-toolkit/package-lock.json
+        env:
+          NODE_AUTH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      - name: Install dependencies
+        run: npm ci
+        working-directory: midi-toolkit
+      - name: Build plugin
+        run: npm run build
+        working-directory: midi-toolkit
+      - name: Upload build
+        uses: actions/upload-artifact@v4
+        with:
+          name: midi-toolkit-dist
+          path: midi-toolkit/dist
+
+  testPlugin:
+    name: Test plugin
+    runs-on: ubuntu-latest
+    needs: installPluginDependencies
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 1
+          sparse-checkout-cone-mode: 'true'
+          sparse-checkout: midi-toolkit
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version-file: midi-toolkit/.nvmrc
+          registry-url: "https://npm.pkg.github.com"
+          cache: "npm"
+          cache-dependency-path: midi-toolkit/package-lock.json
+        env:
+          NODE_AUTH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      - name: Install dependencies
+        run: npm ci
+        working-directory: midi-toolkit
+      - name: Build plugin
+        run: npm run test -- --ci --logHeapUsage
+        working-directory: midi-toolkit
+
+  lintPlugin:
+    name: Lint plugin
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: midi-toolkit
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 1
+          sparse-checkout-cone-mode: 'true'
+          sparse-checkout: midi-toolkit
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version-file: midi-toolkit/.nvmrc
+          registry-url: "https://npm.pkg.github.com"
+          cache: "npm"
+          cache-dependency-path: midi-toolkit/package-lock.json
+        env:
+          NODE_AUTH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      - name: Install dependencies
+        run: npm ci
+      - name: Lint plugin
+        run: npm run lint
+
+  installExampleAppDependencies:
+    name: Install example app dependencies
+    runs-on: ubuntu-latest
+    needs: buildPlugin
+    defaults:
+      run:
+        working-directory: example
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 1
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version-file: example/.nvmrc
+          registry-url: "https://npm.pkg.github.com"
+          cache: "npm"
+          cache-dependency-path: example/package-lock.json
+        env:
+          NODE_AUTH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      - name: Download plugin dist
+        uses: actions/download-artifact@v4
+        with:
+          name: midi-toolkit-dist
+          path: midi-toolkit/dist
+      - name: Install dependencies
+        run: npm ci
+
+  lintExampleApp:
+    name: Lint example app
+    runs-on: ubuntu-latest
+    needs: installExampleAppDependencies
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 1
+      - name: Setup Node.js plugin
+        uses: actions/setup-node@v4
+        with:
+          node-version-file: example/.nvmrc
+          registry-url: "https://npm.pkg.github.com"
+          cache: "npm"
+          cache-dependency-path: example/package-lock.json
+        env:
+          NODE_AUTH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      - name: Install plugin dependencies
+        run: npm ci
+        working-directory: example
+      - name: Download plugin dist
+        uses: actions/download-artifact@v4
+        with:
+          name: midi-toolkit-dist
+          path: midi-toolkit/dist
+      - name: Install example app dependencies
+        run: npm ci
+        working-directory: example
+      - name: Lint example app
+        run: npm run lint
+        working-directory: example
+
+  buildExampleApp:
+    name: Build example app
+    runs-on: ubuntu-latest
+    needs: installExampleAppDependencies
+    defaults:
+      run:
+        working-directory: example
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 1
+      - name: Setup Node.js plugin
+        uses: actions/setup-node@v4
+        with:
+          node-version-file: example/.nvmrc
+          registry-url: "https://npm.pkg.github.com"
+          cache: "npm"
+          cache-dependency-path: example/package-lock.json
+        env:
+          NODE_AUTH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      - name: Download plugin dist
+        uses: actions/download-artifact@v4
+        with:
+          name: midi-toolkit-dist
+          path: midi-toolkit/dist
+      - name: Install dependencies
+        run: npm ci
+      - name: Build example app
+        run: npm run build
