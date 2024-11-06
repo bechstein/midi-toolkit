@@ -103,9 +103,12 @@ if (isControlChange(controlChangeMessage)) {
 - **isSustainPedal(data: Uint8Array)**: Detect if the control change message is for the sustain pedal.
 - **isSoftPedal(data: Uint8Array)**: Detect if the control change message is for the soft pedal.
 - **isSostenutoPedal(data: Uint8Array)**: Detect if the control change message is for the sostenuto pedal.
-- **isHighResVelocity(data: Uint8Array)**: Check if the message uses high-resolution velocity.
+- **isHighResVelocity(data: Uint8Array, lsb: number)**: Check if the message uses high-resolution velocity.
 - **getHighResVelocity(data: Uint8Array)**: Extract the high-resolution velocity.
 - **splitDataPayload(data: Uint8Array)**: Split a payload of MIDI data into individual messages.
+- **generateStatusByte(type: MessageType, channel: number)**: Generates the corresponding status byte given the type and channel.
+- **generateNoteOn(channel: number, note: number, velocity: number)**: Generate the payload for a "Note On" message.
+- **generateNoteOff(channel: number, note: number, velocity: number)**: Generates the payload for a "Note Off" message.
 
 ## Types
 

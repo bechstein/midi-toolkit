@@ -20,6 +20,9 @@ import { splitDataPayload } from './split-data-payload';
 import { getHighResVelocity } from './get-high-res-velocity';
 import { getNoteNumber } from './get-note-number';
 import { getVelocity } from './get-velocity';
+import { generateStatusByte } from './generate-status-byte';
+import { generateNoteOn } from './generate-note-on';
+import { generateNoteOff } from './generate-note-off';
 
 export { MidiNoteOnMessage } from './types/midi-note-on-message';
 export { MidiNoteOffMessage } from './types/midi-note-off-message';
@@ -50,4 +53,7 @@ export {
   getHighResVelocity,
   getNoteNumber,
   getVelocity,
+  generateStatusByte,
+  generateNoteOn,
+  generateNoteOff,
 };
